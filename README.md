@@ -1,0 +1,2 @@
+# LeetCodeRust
+leet code rust
