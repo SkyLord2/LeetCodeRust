@@ -1,5 +1,25 @@
 use std::collections::HashMap;
 /*
+let a = "xxx".to_string();　　
+含义：a绑定到字符串资源A上，拥有资源A的所有权
+
+let mut a = "xxx".to_string();　
+含义：a绑定到字符串资源A上，拥有资源A的所有权，同时a还可绑定到新的资源上面去（更新绑定的能力，但新旧资源类型要同）；
+
+value
+let b = a;
+含义：a绑定的资源A转移给b，b拥有这个资源A
+
+let b = &a;　　
+含义：a绑定的资源A借给b使用，b只有资源A的读权限
+
+let b = &mut a;　　
+含义：a绑定的资源A借给b使用，b有资源A的读写权限
+
+let mut b = &mut a;　　
+含义：a绑定的资源A借给b使用，b有资源A的读写权限。同时，b可绑定到新的资源上面去（更新绑定的能力）
+*/
+/*
 1. 两数之和
 给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，
 并返回它们的数组下标。
@@ -44,7 +64,26 @@ impl ListNode {
   }
 }
 pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
-    head
+    let mut dummy = Some(Box::new(ListNode{val: 0, next: head}));
+    let mut slow_p = &mut dummy;
+    let mut fast_p = &slow_p.clone();
+
+    for _ in 0..=n {
+        if let Some(fast_node) = fast_p {
+            fast_p = &fast_node.next;
+        } else {
+            return None;
+        }
+    }
+
+    while fast_p.is_some() {
+        fast_p = &fast_p.as_ref().unwrap().next;
+        slow_p = &mut slow_p.as_mut().unwrap().next;
+    }
+
+    let remove_p = &mut slow_p.as_mut().unwrap().next;
+    slow_p.as_mut().unwrap().next = remove_p.as_mut().unwrap().next.take();
+    dummy.unwrap().next
 }
 
 /*
@@ -83,7 +122,7 @@ pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
 如果有两个中间结点，则返回第二个中间结点。
 */
 pub fn middle_node(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-
+    head
 }
 
 fn main() {
