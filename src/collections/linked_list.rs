@@ -101,159 +101,55 @@
 //! let mut f = File::open("username.txt")?;
 //! 
 //! ```
-
-use std::collections::HashMap;
-
-/*
-1. 两数之和
-给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，
-并返回它们的数组下标。
-你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
-你可以按任意顺序返回答案。
-*/
-pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
-    let mut result: Vec<i32> = Vec::new();
-    if nums.len() == 0 {
-        return result;
-    }
-    let mut value_to_index:HashMap<i32, usize> = HashMap::with_capacity(nums.len());
-    for (index, value) in nums.iter().enumerate() {
-        if value_to_index.contains_key(&(target - value)) {
-            result.push(value_to_index[&(target - value)] as i32);
-            result.push(index as i32);
-            break;
-        }
-        value_to_index.insert(*value, index);
-    }
-    result
+//! 
+//! 模块系统是显式的(译者注:需要明确的声明)——不存在和文件系统的1:1映射
+//! 我们在一个文件的父级目录把它声明为模块，而不是在文件自身
+//! mod关键字用于声明子模块
+//! 我们需要显式地将函数、结构体等声明为公开的，这样它们才可以被其他模块访问
+//! pub关键字把事物声明为公开的
+//! use关键字用于简化(缩短)模块路径
+//! 我们不需要显式声明第三方的模块
+#[derive(Debug)]
+struct Node<T> {
+    value: T,
+    next: Option<Box<Node<T>>>,
 }
 
-/*
-19. 删除链表的倒数第 N 个结点
-给你一个链表，删除链表的倒数第 n 个结点，并且返回链表的头结点。
-*/
-// Definition for singly-linked list.
-#[derive(PartialEq, Eq, Clone, Debug)]
-pub struct ListNode {
-  pub val: i32,
-  pub next: Option<Box<ListNode>>
+struct LinkedList<T> {
+    head: Option<Box<Node<T>>>,
+    size: usize,
 }
 
-impl ListNode {
-  #[inline]
-  fn new(val: i32) -> Self {
-    ListNode {
-      next: None,
-      val
-    }
-  }
-}
-/// 采用双指针算法，快指针需要前移n+1(添加虚拟头节点)个节点，慢指针开始移动
-pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
-    // 增加一个虚拟头节点，以防要删除的是第一个节点
-    let mut dummy = Some(Box::new(ListNode{val: 0, next: head}));
-    let mut slow_p = &mut dummy;
-    let mut fast_p = &slow_p.clone();
-    // 增加了一个虚拟头节点，故需要前移 n + 1 个节点
-    for _ in 0..=n {
-        if let Some(fast_node) = fast_p {
-            fast_p = &fast_node.next;
-        } else {
-            return None;
-        }
+impl<T> LinkedList<T> {
+    pub fn new() -> self {
+
     }
 
-    while fast_p.is_some() {
-        fast_p = &fast_p.as_ref().unwrap().next;
-        slow_p = &mut slow_p.as_mut().unwrap().next;
-    }
-    // 要删除倒数第 n 个节点，就得获得倒数第 n + 1 个节点的引用
-    let remove_p = &mut slow_p.as_mut().unwrap().next;
-    slow_p.as_mut().unwrap().next = remove_p.as_mut().unwrap().next.take();
-    dummy.unwrap().next
-}
+    pub fn is_empty() -> bool {
 
-/*
-21. 合并两个有序链表
-将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
-*/
-pub fn merge_two_lists(list1: Option<Box<ListNode>>, list2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-    let mut list1 = list1;
-    let mut list2 = list2;
-    // 虚拟头节点
-    let mut ret = ListNode::new(0);
-    // 可变引用
-    let mut ret_r = &mut ret;
-
-    while let (Some(node1), Some(node2)) = (list1.as_mut(), list2.as_mut()) {
-        if node1.val <= node2.val {
-            let list1_tail = node1.next.take();
-            ret_r.next = list1.take();
-            list1 = list1_tail;
-        } else {
-            let list2_tail = node2.next.take();
-            ret_r.next = list2.take();
-            list2 = list2_tail;
-        }
-        ret_r = ret_r.next.as_mut().unwrap();
     }
 
-    ret_r.next = list1.or(list2);
+    pub fn len() -> usize {
 
-    ret.next
-}
-
-pub fn merge_two_lists_iter (list1: Option<Box<ListNode>>, list2: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-    match (list1, list2) {
-        (None, None) => None,
-        (None, l2) => l2,
-        (l1, None) => l1,
-        (Some(mut l1), Some(mut l2)) => {
-            if l1.val <= l2.val {
-                l1.next = self::merge_two_lists_iter(l1.next, Some(l2));
-                Some(l1)
-            } else {
-                 l2.next = self::merge_two_lists_iter(Some(l1), l2.next);
-                 Some(l2)
-            }
-        }
     }
-}
 
-/*
-23. 合并K个升序链表
-给你一个链表数组，每个链表都已经按升序排列。
-请你将所有链表合并到一个升序链表中，返回合并后的链表。
-*/
-pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
-    if lists.len() == 0 {
-        return None;
-    } else {
-        lists[0].clone()
+    pub fn push(&mut self, data: T) -> &mut self {
+
     }
-}
 
-/*
-86. 分隔链表
-给你一个链表的头节点 head 和一个特定值 x ，请你对链表进行分隔，使得所有 小于 x 的节点都出现在 大于或等于 x 的节点之前。
-你应当 保留 两个分区中每个节点的初始相对位置。
-*/
-pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
-    head
-}
+    pub fn pop(&mut self) -> Option<T> {
 
-/*
-876. 链表的中间结点
-给定一个头结点为 head 的非空单链表，返回链表的中间结点。
-如果有两个中间结点，则返回第二个中间结点。
-*/
-pub fn middle_node(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-    head
-}
+    }
 
-fn main() {
-    let nums = vec![3,2,4];
-    let target = 6;
-    let result = two_sum(nums, target);
-    println!("two_sum: {:?}", result);
+    pub fn peek(&self) -> Option<&T> {
+
+    }
+
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
+
+    }
+
+    pub fn reverse(&self) -> LinkedList<T> {
+        
+    }
 }
