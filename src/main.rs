@@ -103,7 +103,8 @@
 //! ```
 
 use std::collections::HashMap;
-
+use std::collections::BinaryHeap;
+use std::cmp::{ Ord, Ordering, PartialOrd };
 /*
 1. 两数之和
 给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，
@@ -147,6 +148,17 @@ impl ListNode {
       val
     }
   }
+}
+
+impl Ord for ListNode {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.val.cmp(&self.val)
+    }
+}
+impl PartialOrd for ListNode {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 /// 采用双指针算法，快指针需要前移n+1(添加虚拟头节点)个节点，慢指针开始移动
 pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
@@ -229,7 +241,24 @@ pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>>
     if lists.len() == 0 {
         return None;
     } else {
-        lists[0].clone()
+        let mut priority_queue = BinaryHeap::new();
+        for list in lists {
+            if let Some(node) = list {
+                priority_queue.push(node);
+            }
+        }
+        // dummy
+        let mut ret = Box::new(ListNode::new(0));
+        let mut ret_ref = &mut ret;
+        while let Some(mut node) = priority_queue.pop() {
+            if let Some(n) = node.next.take() {
+                priority_queue.push(n);
+            }
+            ret_ref.next = Some(node);
+            ret_ref = ret_ref.next.as_mut().unwrap();
+        }
+
+        ret.next
     }
 }
 
