@@ -269,22 +269,22 @@ pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>>
 你应当 保留 两个分区中每个节点的初始相对位置。
 */
 pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
-    let mut head = head;
     // 将一个链表分割成为两个链表，一个大于等x, 一个小于 x
     let mut dummy1 = Box::new(ListNode::new(-1));
     let mut dummy2 = Box::new(ListNode::new(-1));
     let mut p1 = &mut dummy1;
     let mut p2 = &mut dummy2;
+    let mut p = head;
 
-    while let Some(node) = head.as_ref() {
+    while let Some(node) = p.as_ref() {
         if node.val < x {
-            p1.next = head;
+            p1.next = p;
             p1 = p1.next.as_mut().unwrap();
-            head = p1.next.take();
+            p = p1.next.take();
         } else {
-            p2.next = head;
+            p2.next = p;
             p2 = p2.next.as_mut().unwrap();
-            head = p2.next.take();
+            p = p2.next.take();
         }
     }
     p1.next = dummy2.next;
