@@ -297,7 +297,15 @@ pub fn partition(head: Option<Box<ListNode>>, x: i32) -> Option<Box<ListNode>> {
 如果有两个中间结点，则返回第二个中间结点。
 */
 pub fn middle_node(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
-    head
+    let mut fast = &head;
+    let mut slow = &head;
+    
+    while fast.is_some() && fast.as_ref().unwrap().next.is_some() {
+        slow = &slow.as_ref().unwrap().next;
+        fast = &fast.as_ref().unwrap().next;
+        fast = &fast.as_ref().unwrap().next;
+    }
+    return slow.clone();
 }
 
 fn main() {
